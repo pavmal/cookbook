@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from flask_debugtoolbar import DebugToolbarExtension
 from config import Config
-#from models import db
+#from models import
 from data import IngredientGroups, Ingredients, Recipes
 
 NEED_IMPORT = True

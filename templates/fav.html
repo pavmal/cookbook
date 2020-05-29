@@ -39,6 +39,7 @@
         <!-- Рецепты -->
         <div>
           <!-- Рецепт -->
+          {% for recipe in list_recipes %}
           <div class="recipe border-top">
             <form action="/" class="recipe-wrap py-4 px-5">
               <button type="button" class="close" aria-label="Close">
@@ -46,20 +47,20 @@
               </button>
               <div class="row">
                 <div class="col-2">
-                  <img src="../static/recipe-1.jpg" class="img-fluid" alt="" width="152">
+                  <img src="{{recipe['picture']}}" class="img-fluid" alt="" width="152">
                 </div>
                 <div class="col-8">
-                  <p class="h5"><b>Паническая сосиска</b></p>
-                  <p>Куриный суп с вермишелью - первое блюдо, которое с удовольствием съедят и дети, и взрослые. Рецепт супа из куриного филе очень прост.</p>
+                  <p class="h5"><b>{{recipe['title']}}</b></p>
+                  <p>{{recipe['description']}}</p>
                   <div class="row align-items-baseline">
                     <div class="col">
-                      <a href="profile.html" class="btn btn-primary mr-3 mb-2">Открыть рецепт</a>
+                      <a href="{{url_for('render_recipe', recipe_id=recipe['id'])}}" class="btn btn-primary mr-3 mb-2">Открыть рецепт</a>
                     </div>
                     <div class="col">
-                      <span class="text-muted">6 порций по 240 ККал</span>
+                      <span class="text-muted">{{recipe['servings']}} порций по {{recipe['kcal']}} ККал</span>
                     </div>
                     <div class="col">
-                      <span class="text-muted">45 мин (ваши 20 мин)</span>
+                      <span class="text-muted">{{recipe['time']}} мин</span>
                     </div>
                   </div>
                 </div>
@@ -67,8 +68,9 @@
             </form>
           </div>
           <!-- END Рецепт -->
+          {% endfor %}
           <!-- Рецепт -->
-          <div class="recipe border-top">
+          <!--div class="recipe border-top">
             <form class="recipe-wrap py-4 px-5">
               <button type="button" class="close" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -94,10 +96,10 @@
                 </div>
               </div>
             </form>
-          </div>
+          </div-->
           <!-- END Рецепт -->
           <!-- Рецепт -->
-          <div class="recipe border-top">
+          <!--div class="recipe border-top">
             <form class="recipe-wrap py-4 px-5">
               <button type="button" class="close" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -123,10 +125,10 @@
                 </div>
               </div>
             </form>
-          </div>
+          </div-->
           <!-- END Рецепт -->
           <!-- Рецепт -->
-          <div class="recipe border-top">
+          <!--div class="recipe border-top">
             <form class="recipe-wrap py-4 px-5">
               <button type="button" class="close" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -152,7 +154,7 @@
                 </div>
               </div>
             </form>
-          </div>
+          </div-->
           <!-- END Рецепт -->
         </div>
         <!-- END Рецепты -->
