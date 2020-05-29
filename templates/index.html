@@ -70,16 +70,21 @@
     <section class="mx-auto" style="width: 85%;">
       <section class="text-center card">
         <h2 class="h3 py-5 mb-3 font-weight-bold">Самые популярные <br>рецепты</h2>
+
         <div class="row">
+        {% for recipe in list_recipes %}
           <div class="col-lg-4 col-sm-6 border-right pr-0">
             <div class="border-top py-4 px-5 h-100">
-              <a href="#" class="d-block pb-3">
-                <img src="../static/recipe-1.jpg" alt="" width="124" class="rounded-circle">
+              <a href="{{url_for('render_recipe', recipe_id=recipe['id'])}}" class="d-block pb-3">
+                <!--img src="../static/recipe-1.jpg" alt="" width="124" class="rounded-circle"-->
+                <img src="{{recipe['picture']}}" alt="" width="124" class="rounded-circle">
               </a>
-              <a href="#">Паста "Карбонара"</a>
+              <!--a href="#">Паста "Карбонара"</a-->
+              <a href="{{url_for('render_recipe', recipe_id=recipe['id'])}}">{{recipe['title']}}</a>
             </div>
           </div>
-          <div class="col-lg-4 col-sm-6 border-right px-0">
+          {% endfor %}
+          <!--div class="col-lg-4 col-sm-6 border-right px-0">
             <div class="border-top py-4 px-5 h-100">
               <a href="#" class="d-block pb-3">
                 <img src="../static/recipe-1.jpg" alt="" width="124" class="rounded-circle">
@@ -118,8 +123,9 @@
               </a>
               <a href="#">Плов, который всегда получается</a>
             </div>
-          </div>
+          </div-->
         </div>
+
       </section>
     </section>
   </main>

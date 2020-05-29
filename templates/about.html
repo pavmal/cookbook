@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<title>Stepik Travel - about</title>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">★ Всем любителям Python-Flask большой ПРИВЕТ! ★</h1>
+    <section class="mt-2 pb-2">
+        <div class="card mb-2">
+            <div class="embed-responsive embed-responsive-16by9">
+                <img class="card-img-top embed-responsive-item"
+                     src="https://pbs.twimg.com/media/Dz8Gf8qXgAMVmv3.jpg:small" alt=""/>
+            </div>
+            <div class="card-body">
+                <h1 class="h5 card-title text-center">★★★ Это сайт для любителей кулинарных экспериментов ★★★</h1>
+            </div>
+        </div>
+    </section>
+    <a href="{{url_for('home_page')}}" class="btn btn-success">To main menu</a>
+</div>
+</main>
+{% endblock %}

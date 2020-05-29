@@ -26,7 +26,7 @@ migrate = Migrate(app, db)
 
 if __name__ == '__main__':
     if NEED_IMPORT:
-        for elem in IngredientGroups:
+        for elem in Recipes:
             pass
             print(elem['title'])
 
