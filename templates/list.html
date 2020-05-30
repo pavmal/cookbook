@@ -47,8 +47,8 @@
               {% for ingredient in all_ingredients %}
                 {% if ingredient['group'] == group %}
                 <div class="form-check">
-                  <!--input type="checkbox" id="id_{{ingredient.title}}" name="ingredients" value="{{ingredient.id}}"-->
-                  <input type="checkbox" id="id_{{ingredient.title}}" name="ingredients" value="{{ingredient.title}}">
+                  <input type="checkbox" id="id_{{ingredient.title}}" name="ingredients" value="{{ingredient.id}}">
+                  <!--input type="checkbox" id="id_{{ingredient.title}}" name="ingredients" value="{{ingredient.title}}"-->
                   <label for="id_{{ingredient.title}}">{{ingredient.title}}</label>
                 </div>
                 {% endif %}

@@ -20,10 +20,6 @@ class UserForm(FlaskForm):
     usr_admin = HiddenField('Администратор', default=False)
     submit = SubmitField('Запись данных')
 
-class IngredientForm(FlaskForm):
-    name = StringField('Название', validators=[InputRequired()])
-    ingredients = SelectField('Состав блюда', coerce=int, validators=[InputRequired])
-
 
 class RecipeForm(FlaskForm):
     recipe_name = StringField('Название рецепта', validators=[Length(min=3), InputRequired()])

@@ -5,7 +5,7 @@ from flask import abort, flash, session, redirect, request, render_template, url
 
 
 from app import app, db, IngredientGroups, Ingredients, Recipes
-from forms import UserForm, IngredientForm, RecipeForm
+from forms import UserForm, RecipeForm
 from models import User #, RegistrationForm, ChangePasswordForm
 
 
@@ -60,17 +60,23 @@ def render_wizard():
     select_ingredts = [(el['id'], el['title']) for el in all_ingredients]
     print(all_ingredients)
     print(select_ingredts)
-    form = IngredientForm()
-    form.ingredients.choices = select_ingredts
-    return render_template('list.html', groups=list_group, all_ingredients=all_ingredients, form=form)
+
+    return render_template('list.html', groups=list_group, all_ingredients=all_ingredients)
 
 
 @app.route('/wizard-results/', methods=['GET', 'POST'])
 def render_wizard_results():
+    session['food'] = request.form.getlist("ingredients")
+    print(session['food'])
+    list_recipes = []
+    for recipe in Recipes:
+        for elem in session['food']:
+            if int(elem) in recipe['ingredients']:
+                list_recipes.append(recipe)
+    print(len(list_recipes))
+    print(list_recipes)
 
-    selected = request.form.getlist("ingredients")
-    print(selected)
-    return render_template('recipes.html')
+    return render_template('recipes.html', list_recipes=list_recipes)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -162,8 +168,12 @@ def render_new_recipe():
 @app.route('/logout', methods=['POST'])
 def render_logout():
     if session.get('user_name'):
-        session.pop('user_name')
-        session.pop('user_email')
+        session.clear()
+        # session.pop('user_id')
+        # session.pop('user_name')
+        # session.pop('user_email')
+        # session.pop('food')
+
     return redirect(url_for('render_login'))
 
 

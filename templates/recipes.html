@@ -16,31 +16,34 @@
     <div class="mx-auto pt-5 pb-3" style="width: 90%;">
       <section class="card pt-5">
         <div class="text-center pb-5">
-          <h1 class="h2 font-weight-bold">4 рецептa</h1>
+          {% set lenh = list_recipes|length %}
+          <h1 class="h2 font-weight-bold">{{lenh}}{%if lenh == 1%} рецепт{%else%} рецепта{%endif%}</h1>
           <p>Мы нашли для вас</p>
-          <a href="#" class="btn btn-warning rounded-pill px-3">Новый поиск</a>
+          <a href="{{url_for('render_wizard')}}" class="btn btn-warning rounded-pill px-3">Новый поиск</a>
         </div>
         <!-- Рецепты -->
         <div>
           <!-- Рецепт -->
+          {% for recipe in list_recipes %}
           <div class="recipe border-top">
             <div class="recipe-wrap py-4 px-5">
               <div class="row">
+
                 <div class="col-2">
-                  <img src="../static/recipe-1.jpg" class="img-fluid" alt="" width="152">
+                  <img src="{{recipe['picture']}}" class="img-fluid" alt="" width="152">
                 </div>
                 <div class="col-8">
-                  <p class="h5"><b>Паническая сосиска</b></p>
-                  <p>Куриный суп с вермишелью - первое блюдо, которое с удовольствием съедят и дети, и взрослые. Рецепт супа из куриного филе очень прост.</p>
+                  <p class="h5"><b>{{recipe['title']}}</b></p>
+                  <p>{{recipe['description']}}</p>
                   <div class="row align-items-baseline">
                     <div class="col">
-                      <a href="profile.html" class="btn btn-primary mr-3 mb-2">Открыть рецепт</a>
+                      <a href="{{url_for('render_recipe', recipe_id=recipe['id'])}}" class="btn btn-primary mr-3 mb-2">Открыть рецепт</a>
                     </div>
                     <div class="col">
-                      <span class="text-muted">6 порций по 240 ККал</span>
+                      <span class="text-muted">{{recipe['servings']}} порций по {{recipe['kcal']}} ККал</span>
                     </div>
                     <div class="col">
-                      <span class="text-muted">45 мин (ваши 20 мин)</span>
+                      <span class="text-muted">{{recipe['time']}} мин</span>
                     </div>
                   </div>
                 </div>
@@ -48,8 +51,9 @@
             </div>
           </div>
           <!-- END Рецепт -->
+          {% endfor %}
           <!-- Рецепт -->
-          <div class="recipe border-top">
+          <!--div class="recipe border-top">
             <div class="recipe-wrap py-4 px-5">
               <div class="row">
                 <div class="col-2">
@@ -72,10 +76,10 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div-->
           <!-- END Рецепт -->
           <!-- Рецепт -->
-          <div class="recipe border-top">
+          <!--div class="recipe border-top">
             <div class="recipe-wrap py-4 px-5">
               <div class="row">
                 <div class="col-2">
@@ -98,10 +102,10 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div-->
           <!-- END Рецепт -->
           <!-- Рецепт -->
-          <div class="recipe border-top">
+          <!--div class="recipe border-top">
             <div class="recipe-wrap py-4 px-5">
               <div class="row">
                 <div class="col-2">
@@ -123,7 +127,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div-->
           </div>
           <!-- END Рецепт -->
         </div>
