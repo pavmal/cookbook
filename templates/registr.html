@@ -19,10 +19,10 @@
 
     <section class="mx-auto pt-5 pb-3" style="width: 60%;"> 
       <div class="card pr-4">
-        <form action="{{url_for('render_login')}}"  method="POST">
+        <form action="{{url_for('render_register')}}"  method="POST">
           <div class="row">
             <div class="col-6">
-              <img src="../static/login.jpg" alt="" class="img-fluid">
+              <img src="../static/sing-up.jpg" alt="" class="img-fluid">
             </div>
             <div class="col-6 py-4 px-2">
               {% if error_msg: %}
@@ -31,7 +31,11 @@
               <!--div class="alert alert-warning" role="alert">
                 Почта или пароль неверный
               </div-->
-              <p class="h5 my-3"><b>Вход в личный кабинет</b></p>
+              <p class="h5 my-3"><b>Регистрация</b></p>
+              <div class="form-group">
+                {{ form.usr_name.label }}
+                {{ form.usr_name(class="form-control") }}
+              </div>
               <div class="form-group">
                 {{ form.usr_email.label }}
                 {{ form.usr_email(class="form-control") }}

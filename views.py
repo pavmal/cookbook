@@ -60,10 +60,11 @@ def render_register():
         user_email = form.usr_email.data
         user_password = form.usr_password.data
 
-        if not form.validate_on_submit():
+        form.validate_on_submit()
+        if form.usr_name.errors or form.usr_email.errors or form.usr_password.errors:
             error_msg = "Неверно указано имя, email или пароль"
             print(error_msg)
-            return render_template("register.html", form=form, error_msg=error_msg)
+            return render_template("registr.html", form=form, error_msg=error_msg)
 
         # # проверка наличия пользователя в БД
         # user = db.session.query(User).filter(User.email == user_email).first()
@@ -73,7 +74,8 @@ def render_register():
         #     error_msg = "Пользователь с указанным email уже существует"
         #     return render_template("login.html", error_msg=error_msg)
 
-        # сохранение данных о пользователе в БД
+        # сохранение данных о пользователе в БД, session и переходим на Home_page
+        return redirect(url_for('home_page'))
 
     return render_template('registr.html', form=form, error_msg=error_msg)
 
@@ -83,19 +85,36 @@ def render_login():
     form = UserForm()
     error_msg = ''
     if request.method == 'POST':
-        user_name = form.usr_name.data
         user_email = form.usr_email.data
         user_password = form.usr_password.data
 
-        if not form.validate_on_submit():
-            error_msg = "Неверно указан email или пароль"
+        form.validate_on_submit()
+        if form.usr_email.errors or form.usr_password.errors:
+            error_msg = 'Неверно указан email или пароль'
             print(error_msg)
-            return render_template("login.html", form=form, error_msg=error_msg)
+            print(form.usr_email.errors, form.usr_password.errors)
+            return render_template('login.html', form=form, error_msg=error_msg)
 
-        session['user_name'] = user_name
-        session['user_email'] = user_email
-        return "Вы зашли успешно"
+        # # проверка наличия пользователя в БД
+        # user = db.session.query(User).filter(User.email == user_email).first()
+        # # Если такой пользователь не существует
+        # if not user:
+        #     error_msg = "Пользователь с указанным email не существует. Пройдите регистрацию."
+        #     return render_template('registr.html', form=form, error_msg=error_msg)
 
+        # # Если такой пользователь существует, но пароль неверен
+        # if user and пароль неверен:
+        #     error_msg = "Для пользователя указан неверный пароль"
+        #     return render_template('login.html', form=form, error_msg=error_msg)
+
+        # сохранение данных о пользователе в session и переходим на Home_page
+        # session['user_id'] = user_id
+        #session['user_name'] = user_name
+        #session['user_email'] = user_email
+        #return "Вы зашли успешно"
+        #error_msg = 'Вы зашли успешно'
+        #return render_template('login.html', form=form, error_msg=error_msg)
+        return redirect(url_for('home_page'))
 
     return render_template('login.html', form=form, error_msg=error_msg)
 
