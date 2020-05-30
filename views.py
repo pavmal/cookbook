@@ -5,7 +5,7 @@ from flask import abort, flash, session, redirect, request, render_template, url
 
 
 from app import app, db, IngredientGroups, Ingredients, Recipes
-from forms import UserForm
+from forms import UserForm, IngredientForm, RecipeForm
 from models import User #, RegistrationForm, ChangePasswordForm
 
 
@@ -28,6 +28,7 @@ def render_recipe(recipe_id):
         if elem['id'] in one_recipe['ingredients']:
             list_ingredients.append(elem['title'])
     print(list_ingredients)
+
     return render_template('recipe.html', recipe=one_recipe, ingredients=list_ingredients)
 
 
@@ -42,11 +43,33 @@ def render_favorites():
 
 @app.route('/wizard/')
 def render_wizard():
-    return render_template('list.html')
+    list_group = []
+    for elem in IngredientGroups:
+        list_group.append(elem['title'])
+    all_ingredients = []
+    for elem in Ingredients:
+        tmp_dict = {}
+        tmp_dict['id'] = elem['id']
+        tmp_dict['title'] = elem['title']
+        tmp_dict['group_id'] = elem['ingredient_group']
+        for gr in IngredientGroups:
+            if tmp_dict['group_id'] == gr['id']:
+                tmp_dict['group'] = gr['title']
+        all_ingredients.append(tmp_dict)
+
+    select_ingredts = [(el['id'], el['title']) for el in all_ingredients]
+    print(all_ingredients)
+    print(select_ingredts)
+    form = IngredientForm()
+    form.ingredients.choices = select_ingredts
+    return render_template('list.html', groups=list_group, all_ingredients=all_ingredients, form=form)
 
 
-@app.route('/wizard-results/')
+@app.route('/wizard-results/', methods=['GET', 'POST'])
 def render_wizard_results():
+    form = IngredientForm()
+    idf = request.form.get('name')
+    print(idf)
     return render_template('recipes.html')
 
 
@@ -117,6 +140,23 @@ def render_login():
         return redirect(url_for('home_page'))
 
     return render_template('login.html', form=form, error_msg=error_msg)
+
+
+@app.route('/new_recipe/', methods=['GET', 'POST'])
+def render_new_recipe():
+    form = RecipeForm()
+    error_msg = ''
+    if request.method == 'POST':
+        pass
+        r_name = form.recipe_name.data
+        r_picture = form.picture.data
+        r_description = form.description.data
+        r_time = form.time.data
+        r_servings = form.servings.data
+        r_kcal = form.kcal.data
+        r_instruction = form.instruction.data
+
+    return render_template('new_recipe.html', form=form)
 
 
 @app.route('/logout', methods=['POST'])

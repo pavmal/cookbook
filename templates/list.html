@@ -38,11 +38,28 @@
           </div>
         </div>
         <!-- Форма -->
-        <form action="/" class="px-3 pt-2">
+        <form action="{{url_for('render_wizard_results')}}"  method="POST" class="px-3 pt-2">
           <div class="row mx-auto pt-5 mb-5 border-top">
+            {% for group in groups|sort %}
             <div class="col-4">
-              <p><b>Овощи</b></p>
-              <div class="form-check">
+              <!--p><b>Овощи</b></p-->
+              <p><b>{{group}}</b></p>
+              <!--div class="form-check"-->
+              {% for ingredient in all_ingredients %}
+                {% if ingredient['group'] == group %}
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="{{ingredient['id']}}">
+                    <label class="form-check-label" for="{{ingredient['id']}}">
+                      {{ingredient['title']}}
+                    </label>
+                  </div>
+                  <!--p>{{ingredient['title']}}</p-->
+                  <!--p>{{ form.name(class="form-control") }}</p-->
+                  <p>{{ form.ingredients }}</p>
+                {% endif %}
+              {% endfor %}
+              <!--/div-->
+              <!--div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="item1">
                 <label class="form-check-label" for="item1">
                   Картофель
@@ -71,9 +88,10 @@
                 <label class="form-check-label" for="item5">
                   Капуста
                 </label>
-              </div>
+              </div-->
             </div>
-            <div class="col-4">
+            {% endfor %}
+            <!--div class="col-4">
               <p><b>Крупы</b></p>
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="item6" checked="">
@@ -274,7 +292,7 @@
                   Инжир
                 </label>
               </div>
-            </div>
+            </div-->
           </div>
           <!-- Кнопка -->
           <div class="form-group text-center px-0 pt-4 pb-3 border-top">
