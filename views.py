@@ -67,9 +67,9 @@ def render_wizard():
 
 @app.route('/wizard-results/', methods=['GET', 'POST'])
 def render_wizard_results():
-    form = IngredientForm()
-    idf = request.form.get('name')
-    print(idf)
+
+    selected = request.form.getlist("ingredients")
+    print(selected)
     return render_template('recipes.html')
 
 
