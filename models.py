@@ -26,15 +26,15 @@ class IngredientGroup(db.Model):
     group_id = db.Column(db.Integer, primary_key=True)
     group_name = db.Column(db.String(150), unique=True, nullable=False)
     ingredient = db.relationship('Ingredient', back_populates='group')
-
-
+#
+#
 class Ingredient(db.Model):
     __tablename__ = 'ingredients'
     ingredient_id = db.Column(db.Integer, primary_key=True)
-    part_id = db.Column(db.Integer, nullable=False)  # id Ingredients из данных преподавателя
+    part_id = db.Column(db.Integer, nullable=False)  # id Ingredients
     ingredient_name = db.Column(db.String(200), unique=True, nullable=False)
     active = db.Column(db.Boolean, nullable=False)
-    group_id = db.Column(db.Integer, db.ForeignKey('ingredient_groups.group_id'))
+    id_group = db.Column(db.Integer, db.ForeignKey('ingredient_groups.group_id'))
     group = db.relationship('IngredientGroup', back_populates='ingredient')
     in_recipes = db.relationship('Recipe', secondary=ingredients_recipes, back_populates='list_ingredients')
 
@@ -48,7 +48,7 @@ class Recipe(db.Model):
     time = db.Column(db.Integer, nullable=False)
     servings = db.Column(db.Integer, nullable=False)
     kcal = db.Column(db.Float, nullable=False)
-    instruction = db.Column(db.Text, unique=True, nullable=False)
+    instruction = db.Column(db.Text, nullable=False)
     is_active = db.Column(db.Boolean, nullable=False)
     list_ingredients = db.relationship('Ingredient', secondary=ingredients_recipes, back_populates='in_recipes')
     list_users = db.relationship('User', secondary=users_recipes, back_populates='favorite_recipes')
@@ -62,6 +62,8 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False)
     favorite_recipes = db.relationship('Recipe', secondary=users_recipes, back_populates='list_users')
+
+
 
 
 db.create_all()

@@ -6,30 +6,37 @@ from flask import abort, flash, session, redirect, request, render_template, url
 
 from app import app, db, IngredientGroups, Ingredients, Recipes
 from forms import UserForm, RecipeForm
-from models import User #, RegistrationForm, ChangePasswordForm
+from models import User, IngredientGroup, Ingredient, Recipe, users_recipes, ingredients_recipes
 
 
 @app.route('/')
 def home_page():
     u_name = session.get('user_name', None)
 #        return redirect(url_for('render_login'))
-    list_recipes = random.sample(Recipes, k=6)
+    list_recipes = db.session.query(Recipe).all()
+    list_recipes = random.sample(list_recipes, k=6)
+    print(list_recipes)
+    #list_recipes = random.sample(Recipes, k=6)
     return render_template('index.html', u_name=u_name, list_recipes=list_recipes)
 
 
 @app.route('/recipe/<int:recipe_id>/')
 def render_recipe(recipe_id):
-    for recipe in Recipes:
-        if recipe['id'] == recipe_id:
-            one_recipe = {key: val for key, val in recipe.items()}
-    print(one_recipe)
-    list_ingredients = []
-    for elem in Ingredients:
-        if elem['id'] in one_recipe['ingredients']:
-            list_ingredients.append(elem['title'])
+    one_recipe = db.session.query(Recipe).get(recipe_id)
+    list_ingredients = db.session.query(Ingredient).filter(Ingredient.in_recipes.any(Recipe.recipe_id == recipe_id)).all()
     print(list_ingredients)
 
-    return render_template('recipe.html', recipe=one_recipe, ingredients=list_ingredients)
+    # for recipe in Recipes:
+    #     if recipe['id'] == recipe_id:
+    #         one_recipe = {key: val for key, val in recipe.items()}
+    # print(one_recipe)
+    # list_ingredients = []
+    # for elem in Ingredients:
+    #     if elem['id'] in one_recipe['ingredients']:
+    #         list_ingredients.append(elem['title'])
+    # print(list_ingredients)
+    session_food = session.get('food')
+    return render_template('recipe.html', recipe=one_recipe, ingredients=list_ingredients, session_food=session_food)
 
 
 @app.route('/favorites/')
@@ -43,41 +50,76 @@ def render_favorites():
 
 @app.route('/wizard/')
 def render_wizard():
+    full_groups = db.session.query(IngredientGroup).all()
+    full_ingredients = db.session.query(Ingredient).all()
+
     list_group = []
-    for elem in IngredientGroups:
-        list_group.append(elem['title'])
+    for elem in full_groups:
+        list_group.append(elem.group_name)
+
     all_ingredients = []
-    for elem in Ingredients:
+    for elem in full_ingredients:
         tmp_dict = {}
-        tmp_dict['id'] = elem['id']
-        tmp_dict['title'] = elem['title']
-        tmp_dict['group_id'] = elem['ingredient_group']
-        for gr in IngredientGroups:
-            if tmp_dict['group_id'] == gr['id']:
-                tmp_dict['group'] = gr['title']
+        tmp_dict['part_id'] = elem.part_id
+        tmp_dict['title'] = elem.ingredient_name
+        tmp_dict['group_id'] = elem.id_group
+        gr_name = db.session.query(IngredientGroup).get(elem.id_group)
+        tmp_dict['group'] = gr_name.group_name
         all_ingredients.append(tmp_dict)
 
-    select_ingredts = [(el['id'], el['title']) for el in all_ingredients]
-    print(all_ingredients)
-    print(select_ingredts)
+
+        # tmp_dict['group_id'] = elem['ingredient_group']
+        # for gr in IngredientGroups:
+        #     if tmp_dict['group_id'] == gr['id']:
+        #         tmp_dict['group'] = gr['title']
+        # all_ingredients.append(tmp_dict)
+    for elem in full_ingredients:
+        print(elem.part_id, elem.group)
+
+
+
+    # list_group = []
+    # for elem in IngredientGroups:
+    #     list_group.append(elem['title'])
+    # all_ingredients = []
+    # for elem in Ingredients:
+    #     tmp_dict = {}
+    #     tmp_dict['id'] = elem['id']
+    #     tmp_dict['title'] = elem['title']
+    #     tmp_dict['group_id'] = elem['ingredient_group']
+    #     for gr in IngredientGroups:
+    #         if tmp_dict['group_id'] == gr['id']:
+    #             tmp_dict['group'] = gr['title']
+    #     all_ingredients.append(tmp_dict)
+
+    #select_ingredts = [(el['id'], el['title']) for el in all_ingredients]
+    #print(all_ingredients)
+    #print(select_ingredts)
     session_food = session.get('food')
-    tmp = []
-    for el in session_food:
-        tmp.append(int(el))
-    session_food = tmp
+    # tmp = []
+    # for el in session_food:
+    #     tmp.append(int(el))
+    # session_food = tmp
     print('from session food {}'.format(session_food))
     return render_template('list.html', groups=list_group, all_ingredients=all_ingredients, session_food=session_food)
 
 
 @app.route('/wizard-results/', methods=['GET', 'POST'])
 def render_wizard_results():
-    session['food'] = request.form.getlist("ingredients")
-    print(session['food'])
+    session['food'] = [int(x) for x in request.form.getlist("ingredients")]
+    print('from wizard {}'.format(session['food']))
+
     list_recipes = []
-    for recipe in Recipes:
-        for elem in session['food']:
-            if int(elem) in recipe['ingredients']:
-                list_recipes.append(recipe)
+    for elem in session['food']:
+        one_recipes = db.session.query(Recipe).filter(Recipe.list_ingredients.any(Ingredient.part_id == int(elem))).all()
+        list_recipes.append(one_recipes)
+#    print(one_recipes[0].recipe_id)
+
+    # list_recipes = []
+    # for recipe in Recipes:
+    #     for elem in session['food']:
+    #         if int(elem) in recipe['ingredients']:
+    #             list_recipes.append(recipe)
     print(len(list_recipes))
     print(list_recipes)
 

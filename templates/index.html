@@ -75,12 +75,12 @@
         {% for recipe in list_recipes %}
           <div class="col-lg-4 col-sm-6 border-right pr-0">
             <div class="border-top py-4 px-5 h-100">
-              <a href="{{url_for('render_recipe', recipe_id=recipe['id'])}}" class="d-block pb-3">
+              <a href="{{url_for('render_recipe', recipe_id=recipe['recipe_id'])}}" class="d-block pb-3">
                 <!--img src="../static/recipe-1.jpg" alt="" width="124" class="rounded-circle"-->
                 <img src="{{recipe['picture']}}" alt="" width="124" class="rounded-circle">
               </a>
               <!--a href="#">Паста "Карбонара"</a-->
-              <a href="{{url_for('render_recipe', recipe_id=recipe['id'])}}">{{recipe['title']}}</a>
+              <a href="{{url_for('render_recipe', recipe_id=recipe['recipe_id'])}}">{{recipe['recipe_name']}}</a>
             </div>
           </div>
           {% endfor %}
