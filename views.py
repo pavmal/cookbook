@@ -60,8 +60,13 @@ def render_wizard():
     select_ingredts = [(el['id'], el['title']) for el in all_ingredients]
     print(all_ingredients)
     print(select_ingredts)
-
-    return render_template('list.html', groups=list_group, all_ingredients=all_ingredients)
+    session_food = session.get('food')
+    tmp = []
+    for el in session_food:
+        tmp.append(int(el))
+    session_food = tmp
+    print('from session food {}'.format(session_food))
+    return render_template('list.html', groups=list_group, all_ingredients=all_ingredients, session_food=session_food)
 
 
 @app.route('/wizard-results/', methods=['GET', 'POST'])
