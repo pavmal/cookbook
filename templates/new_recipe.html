@@ -2,72 +2,73 @@
 
 {% block header %}
 <title>Cookooha!</title>
-  <style>
+<style>
     body {
       font-family: Arial, sans-serif;
     }
-  </style>
-{% endblock %}
 
+</style>
+{% endblock %}
 
 {% block content %}
 <body class="d-flex flex-column h-100">
-  <main class="container mt-3 mb-5">
+<main class="container mt-3 mb-5">
 
     <div class="mx-auto pt-5 pb-3" style="width: 90%;">
-      <section class="card pt-4 px-2">
-        <!-- Форма -->
-        <form action="{{url_for('render_new_recipe')}}"  method="POST" class="px-3 pt-2">
+        <section class="card pt-4 px-2">
+            <!-- Форма -->
+            <form action="{{url_for('render_new_recipe')}}" method="POST" class="px-3 pt-2">
 
-          <!--div class="row mx-auto pt-5 mb-5 border-top"-->
-          <div class="col-6 px-2">
-            <div class="form-group">
-            {{ form.recipe_name.label }}
-            {{ form.recipe_name(class="form-control") }}
-            </div>
-          </div>
-            <div class="form-group">
-            {{ form.picture.label }}
-            {{ form.picture(class="form-control", placeholder='Ссылка на фото') }}
-            </div>
-            <div class="form-group">
-            {{ form.description.label }}
-            {{ form.description(class="form-control", row=5, placeholder='Ваш текст...') }}
-            </div>
-          <div class="row">
-            <div class="col px-2">
-              <div class="form-group">
-                {{ form.time.label }}
-                {{ form.time(class="form-control", placeholder='в минутах') }}
-              </div>
-            </div>
-            <div class="col px-2">
-              <div class="form-group">
-                {{ form.servings.label }}
-                {{ form.servings(class="form-control", placeholder='целое число') }}
-              </div>
-            </div>
-            <div class="col px-2">
-              <div class="form-group">
-                {{ form.kcal.label }}
-                {{ form.kcal(class="form-control", placeholder='в Ккал') }}
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            {{ form.instruction.label }}
-            {{ form.instruction(class="form-control", row=10, placeholder='Ваш текст...') }}
-          </div>
-          <!--/div-->
-          <!-- Кнопка -->
-          <div class="form-group text-center px-0 pt-4 pb-3 border-top">
-            <input type="submit" value="Поехали, кукуха!" class="btn btn-warning rounded-pill mt-2 px-5 font-weight-bold">
-          </div>
-          <!-- END Кнопка -->
-        </form>
-        <!-- END Форма -->
-      </section>
+                <!--div class="row mx-auto pt-5 mb-5 border-top"-->
+                <div class="col-6 px-2">
+                    <div class="form-group">
+                        {{ form.recipe_name.label }}
+                        {{ form.recipe_name(class="form-control") }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{ form.picture.label }}
+                    {{ form.picture(class="form-control", placeholder='Ссылка на фото') }}
+                </div>
+                <div class="form-group">
+                    {{ form.description.label }}
+                    {{ form.description(class="form-control", row=5, placeholder='Ваш текст...') }}
+                </div>
+                <div class="row">
+                    <div class="col px-2">
+                        <div class="form-group">
+                            {{ form.time.label }}
+                            {{ form.time(class="form-control", placeholder='в минутах') }}
+                        </div>
+                    </div>
+                    <div class="col px-2">
+                        <div class="form-group">
+                            {{ form.servings.label }}
+                            {{ form.servings(class="form-control", placeholder='целое число') }}
+                        </div>
+                    </div>
+                    <div class="col px-2">
+                        <div class="form-group">
+                            {{ form.kcal.label }}
+                            {{ form.kcal(class="form-control", placeholder='в Ккал') }}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{ form.instruction.label }}
+                    {{ form.instruction(class="form-control", row=10, placeholder='Ваш текст...') }}
+                </div>
+                <!--/div-->
+                <!-- Кнопка -->
+                <div class="form-group text-center px-0 pt-4 pb-3 border-top">
+                    <input type="submit" value="Поехали, кукуха!"
+                           class="btn btn-warning rounded-pill mt-2 px-5 font-weight-bold">
+                </div>
+                <!-- END Кнопка -->
+            </form>
+            <!-- END Форма -->
+        </section>
     </div>
 
-  </main>
- {% endblock %}
+</main>
+{% endblock %}
