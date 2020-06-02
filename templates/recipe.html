@@ -32,7 +32,7 @@
 
           <div class="col">
             {% if btn_favor %}
-              <a href="{{url_for('render_favorites', recipe_id=recipe['recipe_id'], action=1)}}" class="btn btn-outline-primary rounded-pill px-4">Добавить в избранное</a>
+              <a href="{{url_for('render_favorites', recipe_id=recipe['recipe_id'], action=1)}}" class="btn btn-outline-primary rounded-pill  px-4">Добавить в избранное</a>
             {% else %}
               <a href="{{url_for('render_favorites', recipe_id=recipe['recipe_id'], action=1)}}" class="btn btn-outline-primary rounded-pill disabled px-4">Добавить в избранное</a>
             {% endif %}

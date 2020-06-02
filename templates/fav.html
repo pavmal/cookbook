@@ -30,12 +30,14 @@
           <img src="/static/icon-skull.png" alt="" width="171">
           <h1 class="h2 font-weight-bold">Избранное</h1>
         </div>
-        {% if add_recipe %}
+        {% if add_recipe == '-1' %}
           <div class="alert alert-warning mx-4 text-center" role="alert">
             Блюдо удалено из избранного.
           </div>
+        {% endif %}
+        {% if add_recipe == '1' %}
           <div class="alert alert-warning mx-4 text-center" role="alert">
-            Блюдо добавлено из избранного.
+            Блюдо добавлено в избранное.
           </div>
         {% endif %}
         <!-- Рецепты -->

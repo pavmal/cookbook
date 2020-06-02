@@ -19,8 +19,8 @@ def home_page():
     print('from session_data {}'.format(session_data))
     #u_name = session.get('user_name', None)
 #        return redirect(url_for('render_login'))
-    list_recipes = db.session.query(Recipe).all()
-    list_recipes = random.sample(list_recipes, k=6)
+    list_recipes = db.session.query(Recipe).order_by(db.func.random()).limit(6)
+    #list_recipes = random.sample(list_recipes, k=6)
     print(list_recipes)
     #list_recipes = random.sample(Recipes, k=6)
     return render_template('index.html', about_user=session_data, fav=favor, list_recipes=list_recipes)
@@ -30,15 +30,16 @@ def home_page():
 def render_recipe(recipe_id):
     session_data = session.get('user', None)
     favor = None
-    btn_favor = True
+    btn_favor = False
     if session_data:
         favor = len(db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
         list_favor = db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all()
+        btn_favor = True
         for elem in list_favor:
             if elem.recipe_id == recipe_id:
                 btn_favor = False
                 break
-
+    print('конпка {}'.format(btn_favor))
     print('from session_data {}'.format(session_data))
     one_recipe = db.session.query(Recipe).get(recipe_id)
     list_ingredients = db.session.query(Ingredient).filter(Ingredient.in_recipes.any(Recipe.recipe_id == recipe_id)).all()
@@ -61,19 +62,26 @@ def render_recipe(recipe_id):
 
 @app.route('/favorites/<int:recipe_id>/<action>/', methods=['GET', 'POST'])
 def render_favorites(recipe_id, action):
-    add_recipe = None
+    add_recipe = action
     session_data = session.get('user', None)
     if not session.get('user'):
         return redirect(url_for('render_login'))
 
     user = db.session.query(User).get(session_data['user_id'])
-    if recipe_id != 0:
+    if recipe_id > 0:
         one_recipe = db.session.query(Recipe).get(recipe_id)
         one_recipe.list_users.append(user)
         db.session.commit()
 
     if request.method == 'POST':
-        print('удаление рецепта из избранного')
+        # list_recipes = db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all()
+        # for elem in list_recipes:
+
+        one_recipe = db.session.query(Recipe).get(recipe_id)
+        one_recipe.list_users.remove(user)
+        db.session.commit()
+
+        print('удаление рецепта из избранного add_recipe = {}'.format(add_recipe))
     list_recipes = db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all()
     favor = len(list_recipes)
     #list_recipes = random.sample(Recipes, k=6)

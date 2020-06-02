@@ -17,7 +17,7 @@
       <section class="card pt-5">
         <div class="text-center pb-5">
           {% set lenh = list_recipes|length %}
-          <h1 class="h2 font-weight-bold">{{lenh}}{%if lenh == 1%} рецепт{%else%} рецепта{%endif%}</h1>
+          <h1 class="h2 font-weight-bold">{{lenh}}{%if lenh == 1%} рецепт{%elif lenh == 0%} рецептов{%elif lenh > 4 %} рецептов{%else%} рецепта{%endif%}</h1>
           <p>Мы нашли для вас</p>
           <a href="{{url_for('render_wizard')}}" class="btn btn-warning rounded-pill px-3">Новый поиск</a>
         </div>
