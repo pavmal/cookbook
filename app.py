@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from data import IngredientGroups, Ingredients, Recipes
 
-NEED_IMPORT = False
+NEED_IMPORT = True
 
 app = Flask(__name__)
 app.config.from_object(Config)
