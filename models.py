@@ -1,15 +1,9 @@
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.dialects.postgresql import JSON
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
 
-# Настройки соединения сделаем позже в модуле приложения
-# db = SQLAlchemy()
-
 # ---------------------------------------------------------
 # database Models
-
 users_recipes = db.Table('users_recipes',
                          db.Column('user_id', db.Integer, db.ForeignKey('users.user_id')),
                          db.Column('recipe_id', db.Integer, db.ForeignKey('recipes.recipe_id'))
@@ -26,8 +20,8 @@ class IngredientGroup(db.Model):
     group_id = db.Column(db.Integer, primary_key=True)
     group_name = db.Column(db.String(150), unique=True, nullable=False)
     ingredient = db.relationship('Ingredient', back_populates='group')
-#
-#
+
+
 class Ingredient(db.Model):
     __tablename__ = 'ingredients'
     ingredient_id = db.Column(db.Integer, primary_key=True)
@@ -77,7 +71,6 @@ class User(db.Model):
         # Проверяем пароль через этот метод
         # Функция check_password_hash превращает password в хеш и сравнивает с хранимым
         return check_password_hash(self.password_hash, password)
-
 
 
 db.create_all()

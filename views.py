@@ -1,104 +1,104 @@
-import random
-from functools import wraps
+from flask import session, redirect, request, render_template, url_for
 
-from flask import abort, flash, session, redirect, request, render_template, url_for
-
-
-from app import app, db, IngredientGroups, Ingredients, Recipes
+from app import app, db
 from forms import UserForm, RecipeForm
 from models import User, IngredientGroup, Ingredient, Recipe, users_recipes, ingredients_recipes
 
 
 @app.route('/')
 def home_page():
-    session_data = session.get('user', None)
-    favor = None
+    """
+    Главная (домашняя) страница. Выводит список 6 рецептов и проверяет наличие авторизованного пользователя
+    :return: 6 рецептов из базы. Пока не формирует список наиболее популярных (добавленных в избранное)
+    """
+    session_data = session.get('user', None)  # проверка прежнего использования сайта через session
+    favor = None  # для отражения данных о наличии избранных рецептов у авторизованных пользователей
     if session_data:
-        favor = len(db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
+        favor = len(
+            db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
 
-    print('from session_data {}'.format(session_data))
-    #u_name = session.get('user_name', None)
-#        return redirect(url_for('render_login'))
     list_recipes = db.session.query(Recipe).order_by(db.func.random()).limit(6)
-    #list_recipes = random.sample(list_recipes, k=6)
-    print(list_recipes)
-    #list_recipes = random.sample(Recipes, k=6)
+
     return render_template('index.html', about_user=session_data, fav=favor, list_recipes=list_recipes)
 
 
 @app.route('/recipe/<int:recipe_id>/')
 def render_recipe(recipe_id):
+    """
+    Форма отражения сведений о рецепте
+    :param recipe_id: id рецепта
+    :return: Информация о рецепте
+    """
     session_data = session.get('user', None)
     favor = None
-    btn_favor = False
+    btn_favor = False  # для достпности кнопки на форме "Добавить в избранное"
     if session_data:
-        favor = len(db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
-        list_favor = db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all()
+        favor = len(
+            db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
+        list_favor = db.session.query(Recipe).filter(
+            Recipe.list_users.any(User.user_id == session_data['user_id'])).all()
         btn_favor = True
         for elem in list_favor:
             if elem.recipe_id == recipe_id:
                 btn_favor = False
                 break
-    print('конпка {}'.format(btn_favor))
-    print('from session_data {}'.format(session_data))
     one_recipe = db.session.query(Recipe).get(recipe_id)
-    list_ingredients = db.session.query(Ingredient).filter(Ingredient.in_recipes.any(Recipe.recipe_id == recipe_id)).all()
+    list_ingredients = db.session.query(Ingredient).filter(
+        Ingredient.in_recipes.any(Recipe.recipe_id == recipe_id)).all()
 
-    print(list_ingredients)
+    session_food = session.get('food')  # проверка наличия ранее выбранных продуктов в холодильнике
 
-    # for recipe in Recipes:
-    #     if recipe['id'] == recipe_id:
-    #         one_recipe = {key: val for key, val in recipe.items()}
-    # print(one_recipe)
-    # list_ingredients = []
-    # for elem in Ingredients:
-    #     if elem['id'] in one_recipe['ingredients']:
-    #         list_ingredients.append(elem['title'])
-    # print(list_ingredients)
-    session_food = session.get('food')
-    print('from session_food {}'.format(session_food))
-    return render_template('recipe.html', about_user=session_data, fav=favor, btn_favor=btn_favor, recipe=one_recipe, ingredients=list_ingredients, session_food=session_food)
+    return render_template('recipe.html', about_user=session_data, fav=favor, btn_favor=btn_favor, recipe=one_recipe,
+                           ingredients=list_ingredients, session_food=session_food)
 
 
 @app.route('/favorites/<int:recipe_id>/<action>/', methods=['GET', 'POST'])
 def render_favorites(recipe_id, action):
+    """
+    Фома отражения списка рецептов из Избранного
+    :param recipe_id: id рецепа для добавления в Избранное
+    :param action: 0: просмотр списка, 1: добавление рецепта в Избранное, -1: удаление из Избранного
+    :return:
+    """
     add_recipe = action
     session_data = session.get('user', None)
-    if not session.get('user'):
+    if not session.get('user'):  # если пользователь не авторизован, то нельзя добавить рецепт в Избранное
         return redirect(url_for('render_login'))
 
     user = db.session.query(User).get(session_data['user_id'])
-    if recipe_id > 0:
+    if recipe_id > 0:  # добавление в Избранное
         one_recipe = db.session.query(Recipe).get(recipe_id)
         one_recipe.list_users.append(user)
         db.session.commit()
 
-    if request.method == 'POST':
-        # list_recipes = db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all()
-        # for elem in list_recipes:
-
+    if request.method == 'POST':  # удаление из Избранного
         one_recipe = db.session.query(Recipe).get(recipe_id)
         one_recipe.list_users.remove(user)
         db.session.commit()
 
-        print('удаление рецепта из избранного add_recipe = {}'.format(add_recipe))
     list_recipes = db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all()
     favor = len(list_recipes)
-    #list_recipes = random.sample(Recipes, k=6)
-    return render_template('fav.html', about_user=session_data, fav=favor, add_recipe=add_recipe, list_recipes=list_recipes)
+
+    return render_template('fav.html', about_user=session_data, fav=favor, add_recipe=add_recipe,
+                           list_recipes=list_recipes)
 
 
 @app.route('/wizard/')
 def render_wizard():
+    """
+    Форма выбора продуктов, которые есть у пользователя
+    :return: Список рецептов, в которых встречается хоть один ингредиент из выбранного списка
+    """
     session_data = session.get('user', None)
     favor = None
     if session_data:
-        favor = len(db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
+        favor = len(
+            db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
 
     full_groups = db.session.query(IngredientGroup).all()
     full_ingredients = db.session.query(Ingredient).all()
 
-    list_group = []
+    list_group = []  # список групп продуктов для вывода продуктов с группировкой
     for elem in full_groups:
         list_group.append(elem.group_name)
 
@@ -112,80 +112,49 @@ def render_wizard():
         tmp_dict['group'] = gr_name.group_name
         all_ingredients.append(tmp_dict)
 
+    session_food = session.get('food')  # проверка наличия ранее выбранных продуктов в холодильнике
 
-        # tmp_dict['group_id'] = elem['ingredient_group']
-        # for gr in IngredientGroups:
-        #     if tmp_dict['group_id'] == gr['id']:
-        #         tmp_dict['group'] = gr['title']
-        # all_ingredients.append(tmp_dict)
-    for elem in full_ingredients:
-        print(elem.part_id, elem.group)
-
-
-
-    # list_group = []
-    # for elem in IngredientGroups:
-    #     list_group.append(elem['title'])
-    # all_ingredients = []
-    # for elem in Ingredients:
-    #     tmp_dict = {}
-    #     tmp_dict['id'] = elem['id']
-    #     tmp_dict['title'] = elem['title']
-    #     tmp_dict['group_id'] = elem['ingredient_group']
-    #     for gr in IngredientGroups:
-    #         if tmp_dict['group_id'] == gr['id']:
-    #             tmp_dict['group'] = gr['title']
-    #     all_ingredients.append(tmp_dict)
-
-    #select_ingredts = [(el['id'], el['title']) for el in all_ingredients]
-    #print(all_ingredients)
-    #print(select_ingredts)
-    session_food = session.get('food')
-    # tmp = []
-    # for el in session_food:
-    #     tmp.append(int(el))
-    # session_food = tmp
-    print('from session food {}'.format(session_food))
-    return render_template('list.html', about_user=session_data, fav=favor, groups=list_group, all_ingredients=all_ingredients, session_food=session_food)
+    return render_template('list.html', about_user=session_data, fav=favor, groups=list_group,
+                           all_ingredients=all_ingredients, session_food=session_food)
 
 
 @app.route('/wizard-results/', methods=['GET', 'POST'])
 def render_wizard_results():
-    session_data = session.get('user', None)
+    """
+    Форма вывода результатов поиска рецептов
+    :return: Список рецептов, в которых есть хоть 1 ингредиент, который есть у пользователя в холодильнике
+    """
+    session_data = session.get('user',
+                               None)  # для отражения количества Избранных рецептов у авторизованных пользователей
     favor = None
     if session_data:
-        favor = len(db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
+        favor = len(
+            db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
 
+    # преобразование элементов списка из строк в цифры
     session['food'] = [int(x) for x in request.form.getlist("ingredients")]
-    print('from wizard {}'.format(session['food']))
 
     list_recipes = []
     for elem in session['food']:
-        one_recipes = db.session.query(Recipe).filter(Recipe.list_ingredients.any(Ingredient.part_id == int(elem))).all()
+        one_recipes = db.session.query(Recipe).filter(
+            Recipe.list_ingredients.any(Ingredient.part_id == int(elem))).all()
         list_recipes.append(one_recipes)
-#    print(one_recipes[0].recipe_id)
-
-    # list_recipes = []
-    # for recipe in Recipes:
-    #     for elem in session['food']:
-    #         if int(elem) in recipe['ingredients']:
-    #             list_recipes.append(recipe)
-    print(len(list_recipes))
-    print(list_recipes)
 
     return render_template('recipes.html', about_user=session_data, fav=favor, list_recipes=list_recipes)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def render_register():
+    """
+    Форма для регистрации новых пользователей
+    :return: Новый пользователь в базе
+    """
     session_data = session.get('user', None)
     form = UserForm()
     error_msg = ''
     if request.method == 'POST':
         u_name = form.usr_name.data
         u_email = form.usr_email.data
-        #u_password = form.usr_password.data
-
 
         form.validate_on_submit()
         if form.usr_name.errors or form.usr_email.errors or form.usr_password.errors:
@@ -206,6 +175,12 @@ def render_register():
         user.password = form.usr_password.data
         db.session.add(user)
         db.session.commit()
+        session['user'] = {
+            'user_id': user.user_id,
+            'username': user.user_name,
+            'email': user.email,
+            'admin': user.is_admin,
+        }
 
         return redirect(url_for('home_page'))
 
@@ -214,12 +189,15 @@ def render_register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def render_login():
+    """
+    Форма авторизации пользователей
+    :return: Авторизованный пользователь с отображением Избранного
+    """
     session_data = session.get('user', None)
     form = UserForm()
     error_msg = ''
     if request.method == 'POST':
         u_email = form.usr_email.data
-        #u_password = form.usr_password.data
 
         form.validate_on_submit()
         if form.usr_email.errors or form.usr_password.errors:
@@ -248,9 +226,6 @@ def render_login():
             'admin': user.is_admin,
         }
         session_data = session.get('user', None)
-        #return "Вы зашли успешно"
-        #error_msg = 'Вы зашли успешно'
-        #return render_template('login.html', form=form, error_msg=error_msg)
         return redirect(url_for('home_page'))
 
     return render_template('login.html', about_user=session_data, form=form, error_msg=error_msg)
@@ -258,6 +233,10 @@ def render_login():
 
 @app.route('/new_recipe/', methods=['GET', 'POST'])
 def render_new_recipe():
+    """
+    Форма для ввода новых рецептов
+    :return: Добавление рецепта в базу. Пока нет возможности указать продукты
+    """
     session_data = session.get('user', None)
     form = RecipeForm()
     error_msg = ''
@@ -276,11 +255,13 @@ def render_new_recipe():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def render_logout():
+    """
+    Форма для выхода
+    :return: Неавторизованный пользователь. Очиста сессии
+    """
     if session.get('user'):
         session.clear()
-
-
-    #return redirect(url_for('home_page'))
+    # return redirect(url_for('home_page'))
     return redirect(url_for('render_login'))
 
 
