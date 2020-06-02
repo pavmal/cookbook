@@ -12,6 +12,10 @@ from models import User, IngredientGroup, Ingredient, Recipe, users_recipes, ing
 @app.route('/')
 def home_page():
     session_data = session.get('user', None)
+    favor = None
+    if session_data:
+        favor = len(db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
+
     print('from session_data {}'.format(session_data))
     #u_name = session.get('user_name', None)
 #        return redirect(url_for('render_login'))
@@ -19,15 +23,26 @@ def home_page():
     list_recipes = random.sample(list_recipes, k=6)
     print(list_recipes)
     #list_recipes = random.sample(Recipes, k=6)
-    return render_template('index.html', about_user=session_data, list_recipes=list_recipes)
+    return render_template('index.html', about_user=session_data, fav=favor, list_recipes=list_recipes)
 
 
 @app.route('/recipe/<int:recipe_id>/')
 def render_recipe(recipe_id):
     session_data = session.get('user', None)
+    favor = None
+    btn_favor = True
+    if session_data:
+        favor = len(db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
+        list_favor = db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all()
+        for elem in list_favor:
+            if elem.recipe_id == recipe_id:
+                btn_favor = False
+                break
+
     print('from session_data {}'.format(session_data))
     one_recipe = db.session.query(Recipe).get(recipe_id)
     list_ingredients = db.session.query(Ingredient).filter(Ingredient.in_recipes.any(Recipe.recipe_id == recipe_id)).all()
+
     print(list_ingredients)
 
     # for recipe in Recipes:
@@ -41,22 +56,37 @@ def render_recipe(recipe_id):
     # print(list_ingredients)
     session_food = session.get('food')
     print('from session_food {}'.format(session_food))
-    return render_template('recipe.html', about_user=session_data, recipe=one_recipe, ingredients=list_ingredients, session_food=session_food)
+    return render_template('recipe.html', about_user=session_data, fav=favor, btn_favor=btn_favor, recipe=one_recipe, ingredients=list_ingredients, session_food=session_food)
 
 
-@app.route('/favorites/')
-def render_favorites():
+@app.route('/favorites/<int:recipe_id>/<action>/', methods=['GET', 'POST'])
+def render_favorites(recipe_id, action):
+    add_recipe = None
     session_data = session.get('user', None)
     if not session.get('user'):
         return redirect(url_for('render_login'))
 
-    list_recipes = random.sample(Recipes, k=6)
-    return render_template('fav.html', about_user=session_data, list_recipes=list_recipes)
+    user = db.session.query(User).get(session_data['user_id'])
+    if recipe_id != 0:
+        one_recipe = db.session.query(Recipe).get(recipe_id)
+        one_recipe.list_users.append(user)
+        db.session.commit()
+
+    if request.method == 'POST':
+        print('удаление рецепта из избранного')
+    list_recipes = db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all()
+    favor = len(list_recipes)
+    #list_recipes = random.sample(Recipes, k=6)
+    return render_template('fav.html', about_user=session_data, fav=favor, add_recipe=add_recipe, list_recipes=list_recipes)
 
 
 @app.route('/wizard/')
 def render_wizard():
     session_data = session.get('user', None)
+    favor = None
+    if session_data:
+        favor = len(db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
+
     full_groups = db.session.query(IngredientGroup).all()
     full_ingredients = db.session.query(Ingredient).all()
 
@@ -108,12 +138,16 @@ def render_wizard():
     #     tmp.append(int(el))
     # session_food = tmp
     print('from session food {}'.format(session_food))
-    return render_template('list.html', about_user=session_data, groups=list_group, all_ingredients=all_ingredients, session_food=session_food)
+    return render_template('list.html', about_user=session_data, fav=favor, groups=list_group, all_ingredients=all_ingredients, session_food=session_food)
 
 
 @app.route('/wizard-results/', methods=['GET', 'POST'])
 def render_wizard_results():
     session_data = session.get('user', None)
+    favor = None
+    if session_data:
+        favor = len(db.session.query(Recipe).filter(Recipe.list_users.any(User.user_id == session_data['user_id'])).all())
+
     session['food'] = [int(x) for x in request.form.getlist("ingredients")]
     print('from wizard {}'.format(session['food']))
 
@@ -131,7 +165,7 @@ def render_wizard_results():
     print(len(list_recipes))
     print(list_recipes)
 
-    return render_template('recipes.html', about_user=session_data, list_recipes=list_recipes)
+    return render_template('recipes.html', about_user=session_data, fav=favor, list_recipes=list_recipes)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -200,7 +234,7 @@ def render_login():
 
         # сохранение данных о пользователе в session и переходим на Home_page
         session['user'] = {
-            'id': user.user_id,
+            'user_id': user.user_id,
             'username': user.user_name,
             'email': user.email,
             'admin': user.is_admin,
@@ -237,10 +271,6 @@ def render_logout():
     if session.get('user'):
         session.clear()
 
-        # session.pop('user_id')
-        # session.pop('user_name')
-        # session.pop('user_email')
-        # session.pop('food')
 
     #return redirect(url_for('home_page'))
     return redirect(url_for('render_login'))

@@ -17,9 +17,9 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse justify-content-end text-right" id="navbarNav">
-        <p class="navbar-text text-body col-4 m-0">
+        <p class="navbar-text text-body col-6 m-0">
           {% if about_user['username'] %}
-          {{about_user['username']}}, в избранном <a href="#" style="text-decoration: underline;">5 рецептов!</a>
+          Привет, {{about_user['username']}}, у тебя в избранном <a href="{{url_for('render_favorites', recipe_id=0, action=0)}}" style="text-decoration: underline;">{%if fav%}{{fav}}{%else%}{{0}}{%endif%} рецептов!</a>
           {% endif %}
         </p>
         <ul class="navbar-nav col-2">

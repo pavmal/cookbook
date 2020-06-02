@@ -29,9 +29,15 @@
           <div class="col">
             <span class="btn btn-outline-secondary rounded-pill px-4">{{recipe['time']}} мин</span>
           </div>
+
           <div class="col">
-            <a href="#" class="btn btn-outline-danger rounded-pill px-4">Добавить в избранное</a>
+            {% if btn_favor %}
+              <a href="{{url_for('render_favorites', recipe_id=recipe['recipe_id'], action=1)}}" class="btn btn-outline-primary rounded-pill px-4">Добавить в избранное</a>
+            {% else %}
+              <a href="{{url_for('render_favorites', recipe_id=recipe['recipe_id'], action=1)}}" class="btn btn-outline-primary rounded-pill disabled px-4">Добавить в избранное</a>
+            {% endif %}
           </div>
+
         </div>
         <h2 class="h5 py-5 px-5 font-weight-normal" style="line-height: 1.5;">{%if recipe['description']%}{{recipe['description']}}{%endif%}</h2>
       </div>
