@@ -6,7 +6,7 @@ import os
 current_path = os.path.dirname(os.path.realpath(__file__))
 # - Путь к файлу БД в данной папке
 #db_path = "sqlite:///" + current_path + "\\test.db"
-db_path = 'postgresql://postgres:pass@127.0.0.1:5432/test'
+db_path = 'postgresql://postgres:pass@127.0.0.1:5432/test1'
 
 
 class Config:

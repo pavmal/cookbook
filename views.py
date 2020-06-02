@@ -11,17 +11,21 @@ from models import User, IngredientGroup, Ingredient, Recipe, users_recipes, ing
 
 @app.route('/')
 def home_page():
-    u_name = session.get('user_name', None)
+    session_data = session.get('user', None)
+    print('from session_data {}'.format(session_data))
+    #u_name = session.get('user_name', None)
 #        return redirect(url_for('render_login'))
     list_recipes = db.session.query(Recipe).all()
     list_recipes = random.sample(list_recipes, k=6)
     print(list_recipes)
     #list_recipes = random.sample(Recipes, k=6)
-    return render_template('index.html', u_name=u_name, list_recipes=list_recipes)
+    return render_template('index.html', about_user=session_data, list_recipes=list_recipes)
 
 
 @app.route('/recipe/<int:recipe_id>/')
 def render_recipe(recipe_id):
+    session_data = session.get('user', None)
+    print('from session_data {}'.format(session_data))
     one_recipe = db.session.query(Recipe).get(recipe_id)
     list_ingredients = db.session.query(Ingredient).filter(Ingredient.in_recipes.any(Recipe.recipe_id == recipe_id)).all()
     print(list_ingredients)
@@ -36,20 +40,23 @@ def render_recipe(recipe_id):
     #         list_ingredients.append(elem['title'])
     # print(list_ingredients)
     session_food = session.get('food')
-    return render_template('recipe.html', recipe=one_recipe, ingredients=list_ingredients, session_food=session_food)
+    print('from session_food {}'.format(session_food))
+    return render_template('recipe.html', about_user=session_data, recipe=one_recipe, ingredients=list_ingredients, session_food=session_food)
 
 
 @app.route('/favorites/')
 def render_favorites():
-    if not session.get('user_id'):
+    session_data = session.get('user', None)
+    if not session.get('user'):
         return redirect(url_for('render_login'))
 
     list_recipes = random.sample(Recipes, k=6)
-    return render_template('fav.html', list_recipes=list_recipes)
+    return render_template('fav.html', about_user=session_data, list_recipes=list_recipes)
 
 
 @app.route('/wizard/')
 def render_wizard():
+    session_data = session.get('user', None)
     full_groups = db.session.query(IngredientGroup).all()
     full_ingredients = db.session.query(Ingredient).all()
 
@@ -101,11 +108,12 @@ def render_wizard():
     #     tmp.append(int(el))
     # session_food = tmp
     print('from session food {}'.format(session_food))
-    return render_template('list.html', groups=list_group, all_ingredients=all_ingredients, session_food=session_food)
+    return render_template('list.html', about_user=session_data, groups=list_group, all_ingredients=all_ingredients, session_food=session_food)
 
 
 @app.route('/wizard-results/', methods=['GET', 'POST'])
 def render_wizard_results():
+    session_data = session.get('user', None)
     session['food'] = [int(x) for x in request.form.getlist("ingredients")]
     print('from wizard {}'.format(session['food']))
 
@@ -123,80 +131,92 @@ def render_wizard_results():
     print(len(list_recipes))
     print(list_recipes)
 
-    return render_template('recipes.html', list_recipes=list_recipes)
+    return render_template('recipes.html', about_user=session_data, list_recipes=list_recipes)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def render_register():
-
+    session_data = session.get('user', None)
     form = UserForm()
     error_msg = ''
     if request.method == 'POST':
-        user_name = form.usr_name.data
-        user_email = form.usr_email.data
-        user_password = form.usr_password.data
+        u_name = form.usr_name.data
+        u_email = form.usr_email.data
+        #u_password = form.usr_password.data
+
 
         form.validate_on_submit()
         if form.usr_name.errors or form.usr_email.errors or form.usr_password.errors:
-            error_msg = "Неверно указано имя, email или пароль"
+            error_msg = 'Неверно указано имя, email или пароль'
             print(error_msg)
-            return render_template("registr.html", form=form, error_msg=error_msg)
+            return render_template('registr.html', about_user=session_data, form=form, error_msg=error_msg)
 
-        # # проверка наличия пользователя в БД
-        # user = db.session.query(User).filter(User.email == user_email).first()
-        # # Если такой пользователь существует
-        # if user:
-        #     # Не можем зарегистрировать, так как пользователь уже существует
-        #     error_msg = "Пользователь с указанным email уже существует"
-        #     return render_template("login.html", error_msg=error_msg)
+        # проверка наличия пользователя в БД
+        user = db.session.query(User).filter(User.email == u_email).first()
+        # Если такой пользователь существует
+        if user:
+            # Не можем зарегистрировать, так как пользователь уже существует
+            error_msg = 'Пользователь с указанным email уже существует'
+            return render_template('login.html', about_user=session_data, form=form, error_msg=error_msg)
 
         # сохранение данных о пользователе в БД, session и переходим на Home_page
+        user = User(user_name=u_name, email=u_email, is_admin=False)
+        user.password = form.usr_password.data
+        db.session.add(user)
+        db.session.commit()
+
         return redirect(url_for('home_page'))
 
-    return render_template('registr.html', form=form, error_msg=error_msg)
+    return render_template('registr.html', about_user=session_data, form=form, error_msg=error_msg)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def render_login():
+    session_data = session.get('user', None)
     form = UserForm()
     error_msg = ''
     if request.method == 'POST':
-        user_email = form.usr_email.data
-        user_password = form.usr_password.data
+        u_email = form.usr_email.data
+        #u_password = form.usr_password.data
 
         form.validate_on_submit()
         if form.usr_email.errors or form.usr_password.errors:
             error_msg = 'Неверно указан email или пароль'
             print(error_msg)
             print(form.usr_email.errors, form.usr_password.errors)
-            return render_template('login.html', form=form, error_msg=error_msg)
+            return render_template('login.html', about_user=session_data, form=form, error_msg=error_msg)
 
-        # # проверка наличия пользователя в БД
-        # user = db.session.query(User).filter(User.email == user_email).first()
-        # # Если такой пользователь не существует
-        # if not user:
-        #     error_msg = "Пользователь с указанным email не существует. Пройдите регистрацию."
-        #     return render_template('registr.html', form=form, error_msg=error_msg)
+        # проверка наличия пользователя в БД
+        user = db.session.query(User).filter(User.email == u_email).first()
+        # Если такой пользователь не существует
+        if not user:
+            error_msg = 'Пользователь с указанным email не существует. Пройдите регистрацию.'
+            return render_template('registr.html', about_user=session_data, form=form, error_msg=error_msg)
 
-        # # Если такой пользователь существует, но пароль неверен
-        # if user and пароль неверен:
-        #     error_msg = "Для пользователя указан неверный пароль"
-        #     return render_template('login.html', form=form, error_msg=error_msg)
+        # Если такой пользователь существует, но пароль неверен
+        if not user.password_valid(form.usr_password.data):
+            error_msg = 'Для пользователя указан неверный пароль'
+            return render_template('login.html', about_user=session_data, form=form, error_msg=error_msg)
 
         # сохранение данных о пользователе в session и переходим на Home_page
-        # session['user_id'] = user_id
-        #session['user_name'] = user_name
-        #session['user_email'] = user_email
+        session['user'] = {
+            'id': user.user_id,
+            'username': user.user_name,
+            'email': user.email,
+            'admin': user.is_admin,
+        }
+        session_data = session.get('user', None)
         #return "Вы зашли успешно"
         #error_msg = 'Вы зашли успешно'
         #return render_template('login.html', form=form, error_msg=error_msg)
         return redirect(url_for('home_page'))
 
-    return render_template('login.html', form=form, error_msg=error_msg)
+    return render_template('login.html', about_user=session_data, form=form, error_msg=error_msg)
 
 
 @app.route('/new_recipe/', methods=['GET', 'POST'])
 def render_new_recipe():
+    session_data = session.get('user', None)
     form = RecipeForm()
     error_msg = ''
     if request.method == 'POST':
@@ -209,18 +229,20 @@ def render_new_recipe():
         r_kcal = form.kcal.data
         r_instruction = form.instruction.data
 
-    return render_template('new_recipe.html', form=form)
+    return render_template('new_recipe.html', about_user=session_data, form=form)
 
 
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['GET', 'POST'])
 def render_logout():
-    if session.get('user_name'):
+    if session.get('user'):
         session.clear()
+
         # session.pop('user_id')
         # session.pop('user_name')
         # session.pop('user_email')
         # session.pop('food')
 
+    #return redirect(url_for('home_page'))
     return redirect(url_for('render_login'))
 
 
@@ -230,4 +252,5 @@ def render_about():
     Представление страницы "О сервисе"
     :return: Описание сервиса
     """
-    return render_template('about.html')
+    session_data = session.get('user', None)
+    return render_template('about.html', about_user=session_data)

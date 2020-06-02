@@ -46,19 +46,25 @@
               <p><b>{{group}}</b></p>
               {% for ingredient in all_ingredients %}
                 {% if ingredient['group'] == group %}
-                  {% if ingredient.part_id in session_food %}
-                    <div class="form-check">
-                      <input type="checkbox" checked id="id_{{ingredient.title}}" name="ingredients" value="{{ingredient.part_id}}">
-                      <label for="id_{{ingredient.title}}">{{ingredient.title}}</label>
-                    </div>
+                  {% if session_food %}
+                    {% if ingredient.part_id in session_food %}
+                      <div class="form-check">
+                        <input type="checkbox" checked id="id_{{ingredient.title}}" name="ingredients" value="{{ingredient.part_id}}">
+                        <label for="id_{{ingredient.title}}">{{ingredient.title}}</label>
+                      </div>
+                    {% else %}
+                      <div class="form-check">
+                        <input type="checkbox" id="id_{{ingredient.title}}" name="ingredients" value="{{ingredient.part_id}}">
+                        <!--input type="checkbox" id="id_{{ingredient.title}}" name="ingredients" value="{{ingredient.title}}"-->
+                        <label for="id_{{ingredient.title}}">{{ingredient.title}}</label>
+                      </div>
+                    {% endif %}
                   {% else %}
-                    <div class="form-check">
-                      <input type="checkbox" id="id_{{ingredient.title}}" name="ingredients" value="{{ingredient.part_id}}">
-                      <!--input type="checkbox" id="id_{{ingredient.title}}" name="ingredients" value="{{ingredient.title}}"-->
-                      <label for="id_{{ingredient.title}}">{{ingredient.title}}</label>
-                    </div>
+                      <div class="form-check">
+                        <input type="checkbox" id="id_{{ingredient.title}}" name="ingredients" value="{{ingredient.part_id}}">
+                        <label for="id_{{ingredient.title}}">{{ingredient.title}}</label>
+                      </div>
                   {% endif %}
-
                 {% endif %}
               {% endfor %}
             </div>

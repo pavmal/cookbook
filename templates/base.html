@@ -18,11 +18,13 @@
       </button>
       <div class="collapse navbar-collapse justify-content-end text-right" id="navbarNav">
         <p class="navbar-text text-body col-4 m-0">
-          dasha, в избранном <a href="#" style="text-decoration: underline;">5 рецептов!</a>
+          {% if about_user['username'] %}
+          {{about_user['username']}}, в избранном <a href="#" style="text-decoration: underline;">5 рецептов!</a>
+          {% endif %}
         </p>
         <ul class="navbar-nav col-2">
           <li class="nav-item active">
-            {% if u_name %}
+            {% if about_user['username'] %}
             <a class="nav-link" href="{{url_for('render_logout')}}">Выйти</a>
             {% else %}
             <a class="nav-link" href="{{url_for('render_login')}}">Войти</a>
