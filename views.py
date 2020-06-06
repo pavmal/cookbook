@@ -19,7 +19,10 @@ def home_page():
 
     list_recipes = db.session.query(Recipe).order_by(db.func.random()).limit(6)
 
-    return render_template('index.html', about_user=session_data, fav=favor, list_recipes=list_recipes)
+    return render_template('index.html',
+                           about_user=session_data,
+                           fav=favor,
+                           list_recipes=list_recipes)
 
 
 @app.route('/recipe/<int:recipe_id>/')
@@ -48,8 +51,13 @@ def render_recipe(recipe_id):
 
     session_food = session.get('food')  # проверка наличия ранее выбранных продуктов в холодильнике
 
-    return render_template('recipe.html', about_user=session_data, fav=favor, btn_favor=btn_favor, recipe=one_recipe,
-                           ingredients=list_ingredients, session_food=session_food)
+    return render_template('recipe.html',
+                           about_user=session_data,
+                           fav=favor,
+                           btn_favor=btn_favor,
+                           recipe=one_recipe,
+                           ingredients=list_ingredients,
+                           session_food=session_food)
 
 
 @app.route('/favorites/<int:recipe_id>/<action>/', methods=['GET', 'POST'])
@@ -136,9 +144,13 @@ def render_wizard_results():
 
     list_recipes = []
     for elem in session['food']:
-        one_recipes = db.session.query(Recipe).filter(
-            Recipe.list_ingredients.any(Ingredient.part_id == int(elem))).all()
-        list_recipes.append(one_recipes)
+        recipes = db.session.query(Recipe).filter(Recipe.list_ingredients.any(Ingredient.part_id == int(elem))).all()
+        if recipes:
+            for one_recipe in recipes:
+                list_recipes.append(one_recipe)
+    print('list_recipes= {}'.format(list_recipes))
+    for el in list_recipes:
+        print(el.recipe_name)
 
     return render_template('recipes.html', about_user=session_data, fav=favor, list_recipes=list_recipes)
 

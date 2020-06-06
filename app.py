@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-#from flask_debugtoolbar import DebugToolbarExtension
+from flask_debugtoolbar import DebugToolbarExtension
 
 from config import Config
 from data import IngredientGroups, Ingredients, Recipes
@@ -42,6 +42,6 @@ if __name__ == '__main__':
                 one_recipe.list_ingredients.append(part_num)
         db.session.commit()
 
-    #app.run('127.0.0.1', 5050, debug=True)
-    app.run()  # for gunicorn server
-#toolbar = DebugToolbarExtension(app)
+    app.run('127.0.0.1', 5050, debug=True)
+    #app.run()  # for gunicorn server
+toolbar = DebugToolbarExtension(app)
