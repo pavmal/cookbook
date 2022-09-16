@@ -17,7 +17,7 @@ importlib-metadata==1.6.0
 itsdangerous==1.1.0
 Jinja2==2.11.1
 joblib==0.14.1
-Mako==1.1.2
+Mako==1.2.2
 MarkupSafe==1.1.1
 murmurhash==1.0.2
 plac==1.1.3
